@@ -27,8 +27,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   DatePickerController _controller = DatePickerController();
 
+  bool isShowDialog = true;
   DateTime _selectedValue = DateTime.now();
-
 
   @override
   void initState() {
@@ -38,12 +38,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.replay),
-        onPressed: () {
-          _controller.animateToSelection();
-        },
-      ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.replay),
+          onPressed: () {
+            //_controller.animateToSelection();
+            setState(() {
+              isShowDialog = !isShowDialog;
+              print("SHOW_DIALOG : " + isShowDialog.toString());
+            });
+          },
+        ),
         appBar: AppBar(
           title: Text(widget.title),
         ),
@@ -70,16 +74,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   initialSelectedDate: DateTime.now(),
                   selectionColor: Colors.black,
                   selectedTextColor: Colors.white,
+                  dialogBtnOk: "Yooo",
+                  dialogBtnCancel: "Nooo",
+                  dialogTitle: "haisss thai gyu",
+                  dialogMessage: "mand mand !!",
+                  isShowDialog: isShowDialog,
                   inactiveDates: [
                     DateTime.now().add(Duration(days: 3)),
                     DateTime.now().add(Duration(days: 4)),
                     DateTime.now().add(Duration(days: 7))
                   ],
                   onDateChange: (date) {
-                    // New date selected
+                    //New date selected
                     setState(() {
                       _selectedValue = date;
                     });
+
+                    // _controller.jumpToSelection();
                   },
                 ),
               ),

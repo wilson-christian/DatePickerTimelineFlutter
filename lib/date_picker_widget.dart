@@ -58,6 +58,12 @@ class DatePicker extends StatefulWidget {
   /// Locale for the calendar default: en_us
   final String locale;
 
+  final String dialogBtnOk;
+  final String dialogBtnCancel;
+  final String dialogTitle;
+  final String dialogMessage;
+  final bool isShowDialog;
+
   DatePicker(
     this.startDate, {
     Key key,
@@ -76,6 +82,11 @@ class DatePicker extends StatefulWidget {
     this.daysCount = 500,
     this.onDateChange,
     this.locale = "en_US",
+    this.dialogBtnOk,
+    this.dialogBtnCancel,
+    this.dialogTitle,
+    this.dialogMessage,
+    this.isShowDialog,
   }) : assert(
             activeDates == null || inactiveDates == null,
             "Can't "
@@ -191,28 +202,68 @@ class _DatePickerState extends State<DatePicker> {
             date: date,
             monthTextStyle: isDeactivated
                 ? deactivatedMonthStyle
-                : isSelected ? selectedMonthStyle : widget.monthTextStyle,
+                : isSelected
+                    ? selectedMonthStyle
+                    : widget.monthTextStyle,
             dateTextStyle: isDeactivated
                 ? deactivatedDateStyle
-                : isSelected ? selectedDateStyle : widget.dateTextStyle,
+                : isSelected
+                    ? selectedDateStyle
+                    : widget.dateTextStyle,
             dayTextStyle: isDeactivated
                 ? deactivatedDayStyle
-                : isSelected ? selectedDayStyle : widget.dayTextStyle,
+                : isSelected
+                    ? selectedDayStyle
+                    : widget.dayTextStyle,
             width: widget.width,
             locale: widget.locale,
             selectionColor:
                 isSelected ? widget.selectionColor : Colors.transparent,
-            onDateSelected: (selectedDate) {
+            onDateSelected: (selectedDate) async {
               // Don't notify listener if date is deactivated
               if (isDeactivated) return;
 
-              // A date is selected
-              if (widget.onDateChange != null ) {
-                widget.onDateChange(selectedDate);
+              if (widget.isShowDialog) {
+                // set up the buttons
+                Widget cancelButton = FlatButton(
+                  child: Text(widget.dialogBtnCancel),
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                );
+                Widget continueButton = FlatButton(
+                  child: Text(widget.dialogBtnOk),
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                );
+
+                // set up the AlertDialog
+                AlertDialog alert = AlertDialog(
+                  title: Text(widget.dialogTitle),
+                  content: Text(widget.dialogMessage),
+                  actions: [
+                    cancelButton,
+                    continueButton,
+                  ],
+                );
+
+                // show the dialog
+                bool result = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return alert;
+                  },
+                );
+
+                if (result) {
+                  goToDate(selectedDate);
+                } else {
+                  print("NOOOOO");
+                }
+              } else {
+                goToDate(selectedDate);
               }
-              setState(() {
-                _currentDate = selectedDate;
-              });
             },
           );
         },
@@ -226,6 +277,16 @@ class _DatePickerState extends State<DatePicker> {
     return date1.day == date2.day &&
         date1.month == date2.month &&
         date1.year == date2.year;
+  }
+
+  void goToDate(DateTime selectedDate) {
+    // A date is selected
+    if (widget.onDateChange != null) {
+      widget.onDateChange(selectedDate);
+    }
+    setState(() {
+      _currentDate = selectedDate;
+    });
   }
 }
 
