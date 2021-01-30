@@ -120,6 +120,12 @@ class _DatePickerState extends State<DatePicker> {
       widget.controller.setDatePickerState(this);
     }
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        widget.controller.jumpToSelection();
+      } catch (e) {}
+    });
+
     this.selectedDateStyle =
         createTextStyle(widget.dateTextStyle, widget.selectedTextColor);
     this.selectedMonthStyle =
