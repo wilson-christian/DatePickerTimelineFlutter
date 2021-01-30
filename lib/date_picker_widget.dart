@@ -259,6 +259,9 @@ class _DatePickerState extends State<DatePicker> {
                 if (result) {
                   goToDate(selectedDate);
                 } else {
+                  try {
+                    widget.controller.jumpToSelection();
+                  } catch (e) {}
                   print("NOOOOO");
                 }
               } else {
